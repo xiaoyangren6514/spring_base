@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 通过set方法注入基本类型类型和引用类型值 -->
+    <bean name="teacher" class="com.happy.hello.f.injection.bean.Teacher">
+        <property name="name" value="赵希杰"/>
+        <property name="age" value="32"/>
+        <property name="address" ref="address"/>
+    </bean>
+
+    <bean name="address" class="com.happy.hello.f.injection.bean.Address">
+        <property name="city" value="北京"/>
+    </bean>
+
+    <!-- 构造函数注入 -->
+    <bean name="book" class="com.happy.hello.f.injection.bean.Book">
+        <constructor-arg name="name" value="深入理解Java虚拟机" index="0" type="java.lang.String"/>
+        <constructor-arg name="address" ref="address" index="1"/>
+    </bean>
+
+    <!-- 通过p命名空间注入 -->
+    <bean name="phone" class="com.happy.hello.f.injection.bean.Phone" p:name="小米" p:version="12"/>
+
+    <!-- 通过SPEL表达式注入 引用类型不支持spel表达式 -->
+    <bean name="koko" class="com.happy.hello.f.injection.bean.Koko">
+        <property name="name" value="#{book.name}"/>
+        <property name="address" ref="address"/>
+    </bean>
+</beans>

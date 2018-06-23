@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop   http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 准备工作，导入aop命名空间 -->
+
+    <!-- 1.准备目标对象 -->
+    <bean name="userService" class="com.happy.hello.j.aop.service.UserServiceImpl"/>
+
+    <!-- 2.准备通知 -->
+    <bean name="myAdvice" class="com.happy.hello.j.aop.advice.MyAdvice"/>
+    <!-- 3.将通知织入到目标对象 -->
+    <aop:config>
+        <!-- 配置通知
+        public void com.happy.hello.j.aop.service.UserServiceImpl.add()
+        void com.happy.hello.j.aop.service.UserServiceImpl.add()
+        * com.happy.hello.j.aop.service.UserServiceImpl.*()
+        * com.happy.hello.j.aop.service.UserServiceImpl.*(..)
+
+        * com.happy.hello.j.aop.service.*ServiceImpl.*(..)
+         * com.happy.hello.j.aop.service..*ServiceImpl.*(..)
+         -->
+        <aop:pointcut id="pc" expression="execution(* com.happy.hello.j.aop.service.*ServiceImpl.*(..))"/>
+        <aop:aspect ref="myAdvice">
+            <aop:before pointcut-ref="pc" method="before"/>
+            <aop:after-returning method="afterReturing" pointcut-ref="pc"/>
+            <aop:after-throwing method="afterException" pointcut-ref="pc"/>
+            <aop:around method="around" pointcut-ref="pc"/>
+            <aop:after method="after" pointcut-ref="pc"/>
+        </aop:aspect>
+    </aop:config>
+</beans>

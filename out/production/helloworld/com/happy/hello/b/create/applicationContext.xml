@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 通过默认构造方法创建bean -->
+    <!--<bean name="student" class="com.happy.hello.b.create.bean.Student">
+        <property name="name" value="xiaoqiang"/>
+    </bean>-->
+
+    <!-- 调用StudentFactory的createStudent 方法，创建Student对象-->
+    <!--
+        <bean name="student" class="com.happy.hello.b.create.bean.StudentFactory" factory-method="createStudent"/>
+    -->
+
+    <!-- 使用实例工厂创建student对象 -->
+    <bean name="instanceFactory" class="com.happy.hello.b.create.bean.InstanceFactory"/>
+    <bean name="student" factory-bean="instanceFactory" factory-method="createStudent"/>
+
+</beans>
