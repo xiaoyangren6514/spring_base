@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <context:property-placeholder location="classpath:com/happy/hello/m/txxml/db.properties"/>
+
+
+    <bean name="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="jdbcUrl" value="${jdbc.jdbcUrl}"/>
+        <property name="driverClass" value="${jdbc.driverClass}"/>
+        <property name="user" value="${jdbc.user}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!-- 事务管理器核心类，封装了所有事务操作，依赖于连接池 -->
+    <bean name="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 事务模板对象 手动处理时使用 -->
+    <bean name="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+        <property name="transactionManager" ref="transactionManager"/>
+    </bean>
+
+    <!-- 配置事务通知 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!--
+                以方法为单位，指定方法应用什么事务级别
+                isolation；隔离级别
+                propagation：传播行为
+                read-only；是否只读
+             -->
+            <tx:method name="save*" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>
+            <tx:method name="update*" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>
+            <tx:method name="delete*" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>
+            <tx:method name="find*" isolation="DEFAULT" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="transfer*" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- 配置织入 -->
+    <aop:config>
+        <!-- 配置切面表达式 -->
+        <aop:pointcut id="txPc" expression="execution(* com.happy.hello.m.txxml.service.*ServiceImpl.*(..))"/>
+        <!-- 配置切面；通知+切入点
+            advice-ref：通知名
+            pointcut-ref：切入点名
+         -->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPc"/>
+    </aop:config>
+
+
+    <bean name="accountDao" class="com.happy.hello.m.txxml.dao.AccountDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean name="accountService" class="com.happy.hello.m.txxml.service.AccountServiceImpl">
+        <property name="accountDao" ref="accountDao"/>
+        <!--
+        手动处理事务时使用，一般不需要设置
+        <property name="transactionTemplate" ref="transactionTemplate"/>-->
+    </bean>
+
+</beans>
